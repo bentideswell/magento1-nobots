@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<layout>
+	<nobots_verify_index>
+		<reference name="root">
+			<action method="setTemplate"><template>page/1column.phtml</template></action>
+		</reference>
+		<reference name="head">
+			<action method="setTitle"><title>Are You Human?</title></action>
+			<action method="setRobots"><robots>noindex,nofollow</robots></action>
+		</reference>
+		<reference name="content">
+			<block type="nobots/verify" name="nobots.verify" template="nobots/verify.phtml" />
+		</reference>
+	</nobots_verify_index>
+</layout>

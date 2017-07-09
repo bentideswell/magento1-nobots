@@ -1,0 +1,31 @@
+<?php
+/**
+ *
+ */
+?>
+<div class="page-title">
+	<h1><?php echo $this->__('Human Verification') ?></h1>
+</div>
+<div class="col2-set">
+	<div class="col-1">
+		<?php echo Mage::helper('nobots/recaptcha')->getJsInclude() ?>
+		<form method="post" action="<?php echo $this->getFormActionUrl() ?>">
+			<div class="no-display">
+				<input type="hidden" name="<?php echo $this->getRedirectToName() ?>" value="<?php echo $this->getRedirectToUrl() ?>" />
+			</div>
+			<ul class="form-list">
+				<li>
+					<?php echo Mage::helper('nobots/recaptcha')->getSiteKeyHtml() ?>
+				</li>
+			</ul>
+			<div class="buttons-set">
+				<button type="submit" class="button"><span><span><?php echo $this->__('Continue') ?></span></span></button>
+			</div>
+		</form>
+	</div>
+	<div class="col-2">
+		<p><?php echo $this->__("We apologize for the confusion, but we can't quite tell if you're a person or a computer program.") ?></p>
+		<p><strong><?php echo $this->__("Please don't take this personally.") ?></strong></p>
+		<p><?php echo $this->__("To continue using the site, enter the CAPTCHA code.") ?></p>
+	</div>
+</div>

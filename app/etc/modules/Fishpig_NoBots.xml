@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Fishpig_NoBots>
+			<active>true</active>
+			<codePool>community</codePool>
+		</Fishpig_NoBots>
+	</modules>
+</config>

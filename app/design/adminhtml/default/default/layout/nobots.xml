@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<layout>
+	<adminhtml_nobots_index>
+		<reference name="content">
+			<block type="nobots/adminhtml_bot" name="nobots.bot" />
+		</reference>
+	</adminhtml_nobots_index>
+</layout>

@@ -1,0 +1,6 @@
+app/etc/modules/Fishpig_NoBots.xml														app/etc/modules/Fishpig_NoBots.xml
+app/code/community/Fishpig/NoBots															app/code/community/Fishpig/NoBots
+app/design/adminhtml/default/default/layout/nobots.xml				app/design/adminhtml/default/default/layout/nobots.xml
+app/design/frontend/base/default/layout/nobots.xml						app/design/frontend/base/default/layout/nobots.xml
+app/design/frontend/base/default/template/nobots/verify.phtml	app/design/frontend/base/default/template/nobots/verify.phtml
+var/connect/Fishpig_NoBots.xml																var/connect/Fishpig_NoBots.xml

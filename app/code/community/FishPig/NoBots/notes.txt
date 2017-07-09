@@ -1,0 +1,47 @@
+##
+# FishPig's NoBots
+# https://fishpig.co.uk/magento/extensions/block-robots-stop-spam/
+##
+
+03/01/2017 - 1.5.0.3
+- Added module selector for form injection (bot blocker) in the configuration.
+
+15/01/2016 - 1.5.0.0
+- Added new 'Are you human?' ReCaptcha code. Extension now requires that you enter your own API keys.
+
+29/07/2015 - 1.4.0.5
+- Removed form protection from pages that contain no forms that need to be protected.
+
+18/11/2014 - 1.4.0.2
+- Added whitelist configuration option
+
+24/06/2014 - 1.4.0.1
+- NoBots now takes into account the 'HTTP_X_FORWARDED_FOR' header
+
+12/04/2014 - 1.4.0.0
+- Improved form protection
+
+17/02/2014 - 1.3.0.0
+- Added extra HTML form protection
+
+18/11/2013 - 1.2.0.0
+- Fixed Magento 1.5.1.* and lower problems
+
+17/11/2013 - 1.1.3.0
+- Fixed secure issue that injected form using HTTP when HTTPS is being used
+- Removed white space from injected form
+
+23/10/2013 - 1.1.2.0
+- Fixed xHTML validation issue
+
+11/10/2013 - 1.1.1.0
+- Removed sort and filter from last seen date in admin
+
+20/07/2013 - 1.1.0.0
+- Bing doesn't seem to respect the nofollow tag, which meant Bing got blocked so have switched to a hidden POST form
+
+09/07/2013 - 1.0.0.1
+- Fixed issue that caused activity date to be the same for all bots
+
+04/07/2013 - 1.0.0.0
+- First stable release. NoBots will automatically block spam bots from your site. This will reduce the strain on your server, making your site faster

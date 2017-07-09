@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<config>
+	<tabs>
+		<fishpig translate="label" module="nobots">
+			<label>FishPig</label>
+			<sort_order>200</sort_order>
+		</fishpig>
+	</tabs>
+    <sections>
+        <nobots translate="label" module="nobots">
+            <label>NoBots Spam Protection</label>
+            <tab>fishpig</tab>
+            <sort_order>450</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+            	<settings>
+            		<label>Bot Protection</label>
+            		<sort_order>1</sort_order>
+            		<show_in_default>1</show_in_default>
+            		<show_in_website>1</show_in_website>
+            		<show_in_store>1</show_in_store>
+            		<fields>
+            			<enabled>
+            				<label>Enabled</label>
+            				<frontend_type>select</frontend_type>
+            				<source_model>adminhtml/system_config_source_yesno</source_model>
+            				<sort_order>1</sort_order>
+            				<show_in_default>1</show_in_default>
+            			</enabled>
+            			<enable_global>
+            				<label>Enable Globally</label>
+            				<frontend_type>select</frontend_type>
+            				<source_model>adminhtml/system_config_source_yesno</source_model>
+            				<sort_order>1</sort_order>
+            				<show_in_default>1</show_in_default>
+            				<depends><enabled>1</enabled></depends>
+            			</enable_global>
+            			<modules>
+            				<label>Allowed Modules</label>
+            				<comment>Modules that bot protection can run on.</comment>
+							<frontend_type>multiselect</frontend_type>
+							<source_model>nobots/system_config_source_module</source_model>
+            				<sort_order>11</sort_order>
+            				<show_in_default>1</show_in_default>
+            				<show_in_website>1</show_in_website>
+            				<show_in_store>1</show_in_store>
+            				<depends><enabled>1</enabled><enable_global>0</enable_global></depends>
+            			</modules>
+            			<whitelist>
+            				<label>White List</label>
+            				<comment>Enter each IP addresses on a new line</comment>
+            				<frontend_type>editor</frontend_type>
+            				<sort_order>21</sort_order>
+            				<show_in_default>1</show_in_default>
+            			</whitelist>
+            		</fields>
+            	</settings>
+            	<form_protection>
+            		<label>Form Protection</label>
+            		<sort_order>11</sort_order>
+            		<show_in_default>1</show_in_default>
+            		<show_in_website>1</show_in_website>
+            		<show_in_store>1</show_in_store>
+            		<fields>
+            			<enabled>
+            				<label>Enabled</label>
+            				<frontend_type>select</frontend_type>
+            				<source_model>adminhtml/system_config_source_yesno</source_model>
+            				<sort_order>1</sort_order>
+            				<show_in_default>1</show_in_default>
+            			</enabled>
+            			<enable_global>
+            				<label>Enable Globally</label>
+            				<frontend_type>select</frontend_type>
+            				<source_model>adminhtml/system_config_source_yesno</source_model>
+            				<sort_order>1</sort_order>
+            				<show_in_default>1</show_in_default>
+            				<depends><enabled>1</enabled></depends>
+            			</enable_global>
+            			<modules>
+            				<label>Allowed Modules</label>
+            				<comment>Modules that form protection can run on.</comment>
+							<frontend_type>multiselect</frontend_type>
+							<source_model>nobots/system_config_source_module</source_model>
+            				<sort_order>3</sort_order>
+            				<show_in_default>1</show_in_default>
+            				<show_in_website>1</show_in_website>
+            				<show_in_store>1</show_in_store>
+            				<depends><enabled>1</enabled><enable_global>0</enable_global></depends>
+            			</modules>
+            			<form_ids>
+            				<label>Form IDs</label>
+            				<comment>Enter a list of IDs for the HTML forms that you want to protect. Enter each ID on a new line.</comment>
+            				<frontend_type>editor</frontend_type>
+            				<sort_order>6</sort_order>
+            				<show_in_default>1</show_in_default>
+            				<depends><enabled>1</enabled></depends>
+            			</form_ids>
+            		</fields>
+            	</form_protection>
+            	<recaptcha>
+            		<label>ReCaptcha</label>
+            		<comment><![CDATA[
+	            			<ul class="messages" id="recaptcha-msg"><li class="notice-msg"><strong>For full spam protection, please generate your free API keys at <a href="https://www.google.com/recaptcha/admin" target="_blank">this URL</a> and them enter them in the ReCaptcha section below.</strong></li></ul>
+	            			<script type="text/javascript">
+							document.observe("dom:loaded", function() {
+		            			if ($('nobots_recaptcha_public_key').getValue() && $('nobots_recaptcha_private_key').getValue()) {
+			            			$('recaptcha-msg').remove();
+		            			}
+		            			else {
+			            			$('content').select('.content-header').first().insert({after: $('recaptcha-msg')});
+			            		}
+							});
+							</script>
+	            	]]></comment>
+            		<sort_order>31</sort_order>
+            		<show_in_default>1</show_in_default>
+            		<fields>
+            			<public_key>
+            				<label>Site Key</label>
+            				<frontend_type>text</frontend_type>
+            				<sort_order>1</sort_order>
+            				<show_in_default>1</show_in_default>
+            			</public_key>
+            			<private_key>
+            				<label>Secret Key</label>
+            				<frontend_type>text</frontend_type>
+            				<sort_order>2</sort_order>
+            				<show_in_default>1</show_in_default>
+            			</private_key>
+            		</fields>
+            	</recaptcha>
+            </groups>
+        </nobots>
+    </sections>
+</config>

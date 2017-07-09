@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<config>
+	<menu>
+		<system>
+			<children>
+				<tools>
+					<children>
+						<nobots>
+							<title>NoBots</title>
+							<action>adminhtml/nobots</action>
+							<sort_order>999</sort_order>
+						</nobots>
+					</children>
+				</tools>
+			</children>
+		</system>
+	</menu>
+	<acl>
+		<resources>
+			<admin>
+				<children>
+					<tools>
+						<children>
+							<nobots>
+								<children>
+									<splashpro translate="title" module="nobots">
+										<title>No Bots</title>
+										<sort_order>6</sort_order>
+									</splashpro>
+								</children>
+							</nobots>
+						</children>
+					</tools>
+					<system>
+						<children>
+							<config>
+								<children>
+									<nobots translate="title" module="nobots">
+										<title>No Bots</title>
+										<sort_order>990</sort_order>
+									</nobots>
+								</children>
+							</config>
+						</children>
+					</system>
+				</children>
+			</admin>
+		</resources>
+	</acl>
+</config>
