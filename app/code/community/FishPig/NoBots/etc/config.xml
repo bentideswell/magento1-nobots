@@ -2,7 +2,7 @@
 <config>
 	<modules>
 		<Fishpig_NoBots>
-			<version>1.5.0.5</version>
+			<version>1.5.0.6</version>
 		</Fishpig_NoBots>
 	</modules>
 	<global>
@@ -72,6 +72,11 @@
 						<class>nobots/observer</class>
 						<method>rejectNaughtyBotsObserver</method>
 					</nobots>
+					<nobots_email_protect>
+						<type>singleton</type>
+						<class>nobots/observer</class>
+						<method>blockBadEmailDomainObserver</method>
+					</nobots_email_protect>
 				</observers>
 			</controller_action_predispatch>
 		</events>
@@ -120,7 +125,11 @@ product_addtocart_form
 review-form
 login-form
 search_mini_form
+newsletter-validate-detail
+form-validate
 ]]></form_ids>
+				<blocked_email_domains>@qq.com
+</blocked_email_domains>
 			</form_protection>
 		</nobots>
 	</default>

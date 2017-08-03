@@ -148,6 +148,89 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		return $this;
 	}
 	
+	/*
+	 *
+	 *
+	 */
+	public function blockBadEmailDomainObserver()
+	{
+		$request = Mage::app()->getRequest();
+
+		// Only apply to POST requests
+		if ('POST' !== strtoupper($request->getMethod())) {
+			return $this;
+		}
+		
+		// Don't apply to checkout
+		if ($request->getModuleName() === 'checkout' && $request->getControllerName() === 'onepage') {
+			return $this;
+		}
+		
+		// Get and parse into an array the blocked email domains
+		if ('' === ($blockedEmailDomains = trim(Mage::getStoreConfig('nobots/form_protection/blocked_email_domains')))) {
+			$blockedEmailDomains = '@qq.com';
+		}
+		else {
+			$blockedEmailDomains .= "\n@qq.com";
+		}
+		
+		$blockedEmailDomains = array_unique(explode("\n", $blockedEmailDomains));
+
+		foreach($blockedEmailDomains as $key => $blockedEmailDomain) {
+			$blockedEmailDomain = trim($blockedEmailDomain);
+			
+			if (!$blockedEmailDomain) {
+				unset($blockedEmailDomains[$key]);
+				continue;
+			}
+			
+			$blockedEmailDomains[$key] = '@' . ltrim($blockedEmailDomain, '@');
+		}
+
+		$sources = array(
+			'POST' => $request->getPost(),
+			'GET'  => $request->getParams(),
+		);
+		
+		foreach($sources as $key => $source) {
+			$encodedSource = json_encode($source);
+			
+			if ($encodedSource !== str_replace($blockedEmailDomains, '', $encodedSource)) {
+				if (true === $this->_checkForBlockedEmailDomains($source, $blockedEmailDomains)) {
+					// Banned domain found so redirect
+					header('Location: ' . Mage::getUrl());
+					exit;
+				}
+			}
+		}
+		
+		return $this;
+	}
+	
+	/*
+	 *
+	 *
+	 */
+	protected function _checkForBlockedEmailDomains($data, $blockedEmailDomains)
+	{
+		if (is_array($data)) {
+			foreach($data as $key => $value) {
+				if (true === $this->_checkForBlockedEmailDomains($value, $blockedEmailDomains)) {
+					return true;
+				}
+			}
+		}	
+		else if ($data) {
+			foreach($blockedEmailDomains as $blockedEmailDomain) {
+				if ((int)strpos($data, $blockedEmailDomain) === (int)(strlen($data) - strlen($blockedEmailDomain))) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+	
 	/**
 	 * Get the ID of the honeypot form
 	 *

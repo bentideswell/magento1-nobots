@@ -3,6 +3,9 @@
 # https://fishpig.co.uk/magento/extensions/block-robots-stop-spam/
 ##
 
+03/07/2017 - 1.5.0.6
+- Added banned email domains. This allows you to specify email domains (eg. @qq.com) and if any of those are used, the request will not be processed. This is perfect if you find you have an email domain that is being used to create multiple spam accounts or newsletter subscriptions (eg. @qq.com) as you can instantly block this from your site.
+
 03/01/2017 - 1.5.0.3
 - Added module selector for form injection (bot blocker) in the configuration.
 

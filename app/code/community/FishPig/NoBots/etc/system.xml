@@ -98,12 +98,20 @@
             				<show_in_default>1</show_in_default>
             				<depends><enabled>1</enabled></depends>
             			</form_ids>
+            			<blocked_email_domains>
+            				<label>Blocked Email Domains</label>
+            				<comment>Enter a list of email domains to block (eg. @qq.com). Enter each email domain on a new line.</comment>
+            				<frontend_type>editor</frontend_type>
+            				<sort_order>11</sort_order>
+            				<show_in_default>1</show_in_default>
+            				<depends><enabled>1</enabled></depends>
+            			</blocked_email_domains>
             		</fields>
             	</form_protection>
             	<recaptcha>
             		<label>ReCaptcha</label>
             		<comment><![CDATA[
-	            			<ul class="messages" id="recaptcha-msg"><li class="notice-msg"><strong>For full spam protection, please generate your free API keys at <a href="https://www.google.com/recaptcha/admin" target="_blank">this URL</a> and them enter them in the ReCaptcha section below.</strong></li></ul>
+	            			<ul class="messages" id="recaptcha-msg"><li class="notice-msg"><strong>For full Bot protection, please generate your free API keys at <a href="https://www.google.com/recaptcha/admin" target="_blank">this URL</a> and them enter them in the ReCaptcha section below. This does not affect form protection, only bot protection.</strong></li></ul>
 	            			<script type="text/javascript">
 							document.observe("dom:loaded", function() {
 		            			if ($('nobots_recaptcha_public_key').getValue() && $('nobots_recaptcha_private_key').getValue()) {

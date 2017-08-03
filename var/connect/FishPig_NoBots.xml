@@ -1,5 +1,5 @@
 <_>
-   <form_key>f9CaPtfgsydPFLV1</form_key>
+   <form_key>6kf7S2AwsNwHeH1C</form_key>
    <name>FishPig_NoBots</name>
    <channel>community</channel>
    <version_ids>
@@ -9,9 +9,9 @@
    <description>Block spam bots from your site automatically</description>
    <license>FishPig EULA</license>
    <license_uri>http://fishpig.co.uk/license.txt</license_uri>
-   <version>1.5.0.5</version>
+   <version>1.5.0.6</version>
    <stability>stable</stability>
-   <notes>For changes, please see http://fishpig.co.uk/magento/extensions/block-robots-stop-spam/#changelog</notes>
+   <notes>For changes, please see https://fishpig.co.uk/magento/extensions/block-robots-stop-spam/#changelog</notes>
    <authors>
       <name>
          <name>fishpig</name>
@@ -40,7 +40,7 @@
             <max/>
          </max>
          <files>
-            <files>                </files>
+            <files>                 </files>
          </files>
       </package>
       <extension>
