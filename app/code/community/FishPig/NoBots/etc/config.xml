@@ -2,7 +2,7 @@
 <config>
 	<modules>
 		<Fishpig_NoBots>
-			<version>1.5.0.6</version>
+			<version>1.5.1.3</version>
 		</Fishpig_NoBots>
 	</modules>
 	<global>
@@ -77,6 +77,13 @@
 						<class>nobots/observer</class>
 						<method>blockBadEmailDomainObserver</method>
 					</nobots_email_protect>
+					<!--
+					<nobots_form_secret_field_check>
+						<type>singleton</type>
+						<class>nobots/observer</class>
+						<method>checkForSecretFormFieldObserver</method>
+					</nobots_form_secret_field_check>
+					-->
 				</observers>
 			</controller_action_predispatch>
 		</events>
@@ -130,6 +137,7 @@ form-validate
 ]]></form_ids>
 				<blocked_email_domains>@qq.com
 </blocked_email_domains>
+				<!--<form_secret_field>1</form_secret_field>-->
 			</form_protection>
 		</nobots>
 	</default>

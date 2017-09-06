@@ -60,7 +60,7 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 			$name = Mage::getStoreConfig('general/store_information/name');
 			$url = Mage::helper('nobots')->getHoneyPotUrl();
 	
-			$link = str_replace(array("\n", "\t"), '', sprintf('<div class="no-display">
+			$link = str_replace(array("\n", "\t"), '', sprintf('<div style="display:none;">
 				<form method="post" action="%s" id="%s">
 					<fieldset>
 						<legend>Post your comment</legend>
@@ -80,6 +80,88 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		$this->_applyFormSpamProtection($html);
 		
 		$front->getResponse()->setBody($html);
+	}
+
+	/*
+	 *
+	 * @param Varien_Event_Observer $observer
+	 *
+	 * @return void
+	 */
+	public function checkForSecretFormFieldObserver(Varien_Event_Observer $observer)
+	{
+		return $this;
+		// If it's not frontend, we don't want anything to do with it
+		if ('frontend' !== Mage::getDesign()->getArea()) {
+			return $this;
+		}
+
+		// Form protection is disabled so return
+		if (!Mage::getStoreConfigFlag('nobots/form_protection/enabled')) {
+			return $this;	
+		}
+		
+		if (!Mage::getStoreConfigFlag('nobots/form_protection/form_secret_field')) {
+			return $this;	
+		}
+		
+		// Ajax request so bail
+		if ($this->isAjax()) {
+			return $this;
+		}
+		
+		// Get some useful variables
+		$request = Mage::app()->getRequest();
+		$method  = strtoupper($request->getMethod());
+		$route	 = strtolower($request->getModuleName() . '/' . $request->getControllerName() . '/' . $request->getActionName());
+		
+		// We're on the checkout so bail!
+		if (strpos($route, 'checkout') !== false) {
+			return $this;
+		}
+		
+		// Check for get and post and check validity
+		$isInvalidGetRequest  = 'GET'  === $method && 1 !== (int)$request->getParam($this->getSecretFormField()) && count($_GET) > 0;
+		$isInvalidPostRequest = 'POST' === $method && 1 !==  (int)$request->getPost($this->getSecretFormField());
+
+		// Check whether the request is good
+		if ($isInvalidGetRequest || $isInvalidPostRequest) {
+			// Log the IP address
+			Mage::log(Mage::helper('core/http')->getRemoteAddr(true), null, 'nobots-form-secret-field-protection.log', true);
+
+			// Add an error message
+			Mage::getSingleton('core/session')->addError(
+				Mage::helper('nobots')->__('The form submission was invalid. If this error persists, please let us know.')
+			);
+
+			// Redirect to the homepage
+			header('Location: ' . Mage::getBaseUrl());
+			exit;
+		}
+	}
+
+	/*
+	 *
+	 * @param  string $html
+	 * @return void
+	 */
+	protected function _applyFormSecretFieldProtection(&$html)
+	{
+		$script = '<script type="text/javascript">(function(){var fs=document.getElementsByTagName(\'form\');for(var i=0;i<fs.length;i++){
+var e=document.createElement(\'input\');e.name=\'' . $this->getSecretFormField() . '\';e.value=1;e.type=\'hidden\';fs[i].appendChild(e);	
+}})();</script>';
+
+		$html = str_replace('</body>', $script . "</body>", $html);
+	}
+	
+	/*
+	 *
+	 *
+	 * @return string
+	 */
+	public function getSecretFormField()
+	{
+		return substr(md5(Mage::getBaseUrl() . '-FishPig-NoBots'), 0, 16);
 	}
 	
 	/**
@@ -243,5 +325,15 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		}
 		
 		return $this->_getData('no_bots_form_id');
+	}
+	
+	/*
+	 * Determine whether the current request is an ajax request
+	 *
+	 * @return bool
+	 */
+	public function isAjax()
+	{
+		return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 	}
 }
