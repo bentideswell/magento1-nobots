@@ -2,7 +2,7 @@
 <config>
 	<modules>
 		<Fishpig_NoBots>
-			<version>1.5.1.3</version>
+			<version>1.5.2.0</version>
 		</Fishpig_NoBots>
 	</modules>
 	<global>
@@ -137,6 +137,11 @@ form-validate
 ]]></form_ids>
 				<blocked_email_domains>@qq.com
 </blocked_email_domains>
+<blocked_url_fields><![CDATA[firstname
+lastname
+email
+nickname
+]]></blocked_url_fields>
 				<!--<form_secret_field>1</form_secret_field>-->
 			</form_protection>
 		</nobots>

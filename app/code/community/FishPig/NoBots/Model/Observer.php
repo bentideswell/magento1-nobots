@@ -190,6 +190,12 @@ var e=document.createElement(\'input\');e.name=\'' . $this->getSecretFormField()
 			return $this;
 		}
 		
+		$formIds = array_unique($formIds);
+		
+		foreach($formIds as $key => $formId) {
+			$formIds[$key] = trim($formId);
+		}
+
 		if (preg_match_all('/(<form.*>)/Uis', $html, $matches)) {
 			$scripts = array();
 
@@ -286,9 +292,52 @@ var e=document.createElement(\'input\');e.name=\'' . $this->getSecretFormField()
 			}
 		}
 		
+		// Block URLs in specific fields
+		if ($blockedUrlFields = trim(Mage::getStoreConfig('nobots/form_protection/blocked_url_fields'))) {
+			$blockedUrlFields = explode("\n", $blockedUrlFields);
+			
+			foreach($blockedUrlFields as $key => $value) {
+				$blockedUrlFields[$key] = trim($value);
+				
+				if (empty($blockedUrlFields[$key])) {
+					unset($blockedUrlFields[$key]);
+				}
+			}
+			
+			if (count($blockedUrlFields) > 0) {
+				foreach($sources as $key => $source) {
+					if ($this->_arrayContainsUrl($source, $blockedUrlFields)) {
+						// URL found in field so redirect
+						header('Location: ' . Mage::getUrl());
+						exit;
+					}
+				}
+			}
+		}
+
 		return $this;
 	}
 	
+	protected function _arrayContainsUrl($source, $fields)
+	{
+		foreach($source as $key => $value) {
+			if (is_array($value)) {
+				if ($this->_arrayContainsUrl($value, $fields)) {
+					return true;
+				}
+			}
+			else if (in_array($key, $fields)) {
+				$value = strtolower($value);
+				
+				if (strpos($value, 'http:') !== false || strpos($value, 'https:') !== false || strpos($value, 'www.') !== false) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
 	/*
 	 *
 	 *

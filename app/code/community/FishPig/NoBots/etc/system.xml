@@ -106,6 +106,14 @@
             				<show_in_default>1</show_in_default>
             				<depends><enabled>1</enabled></depends>
             			</blocked_email_domains>
+            			<blocked_url_fields>
+            				<label>Blocked URL Fields</label>
+            				<comment>Enter a list of form fields that cannot contain a URL.</comment>
+            				<frontend_type>editor</frontend_type>
+            				<sort_order>16</sort_order>
+            				<show_in_default>1</show_in_default>
+            				<depends><enabled>1</enabled></depends>
+            			</blocked_url_fields>
             			<!--
             			<form_secret_field>
             				<label>Secret Field Protection</label>

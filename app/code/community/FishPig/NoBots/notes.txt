@@ -3,6 +3,9 @@
 # https://fishpig.co.uk/magento/extensions/block-robots-stop-spam/
 ##
 
+15/11/2017 - 1.5.2.0
+- Added ability to block form submissions that contain URLs in specific fields
+
 29/08/2017 - 1.5.1.0
 - Added secret form field protection (enabled by default).
 
