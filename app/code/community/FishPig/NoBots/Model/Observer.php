@@ -1,9 +1,9 @@
 <?php
 /**
- * @category    Fishpig
+ * @category   Fishpig
  * @package    Fishpig_NoBots
- * @license      http://fishpig.co.uk/license.txt
- * @author       Ben Tideswell <ben@fishpig.co.uk>
+ * @license    http://fishpig.co.uk/license.txt
+ * @author     Ben Tideswell <ben@fishpig.co.uk>
  */
 
 class Fishpig_NoBots_Model_Observer extends Varien_Object
@@ -274,6 +274,8 @@ var e=document.createElement(\'input\');e.name=\'' . $this->getSecretFormField()
 			
 			$blockedEmailDomains[$key] = '@' . ltrim($blockedEmailDomain, '@');
 		}
+		
+		$blockedEmailDomains[] = 'arachni@email.gr';
 
 		$sources = array(
 			'POST' => $request->getPost(),
