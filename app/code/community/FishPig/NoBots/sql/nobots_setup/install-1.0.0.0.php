@@ -1,9 +1,10 @@
 <?php
 /**
- * @category    Fishpig
+ * @category   Fishpig
  * @package    Fishpig_NoBots
- * @license      http://fishpig.co.uk/license.txt
- * @author       Ben Tideswell <ben@fishpig.co.uk>
+ * @license    http://fishpig.co.uk/license.txt
+ * @author     Ben Tideswell <ben@fishpig.co.uk>
+ * @SkipObfuscation
  */
 
 	$this->startSetup();
