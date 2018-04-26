@@ -1,72 +1,59 @@
 <?php
-/**
- * @category    Fishpig
+/*
+ * @category   Fishpig
  * @package    Fishpig_NoBots
- * @license      http://fishpig.co.uk/license.txt
- * @author       Ben Tideswell <ben@fishpig.co.uk>
+ * @license    https://fishpig.co.uk/license.txt
+ * @author     Ben Tideswell <ben@fishpig.co.uk>
  */
-
 class Fishpig_NoBots_Controller_Router extends Mage_Core_Controller_Varien_Router_Abstract
 {
-	/**
+	/*
 	 * Initialize Controller Router
 	 *
 	 * @param Varien_Event_Observer $observer
-	*/
+	 */
 	public function initControllerRouters(Varien_Event_Observer $observer)
 	{
+		$bot = Mage::helper('nobots')->getBot(false);
+
+		if ($bot !== false && $bot->isBanned()) {
+			$this->showBlockPage();
+		}
+		
 		$observer->getEvent()->getFront()->addRouter('nobots', $this);
 	}
 
-    /**
-     * Validate and Match NoBots and modify request
-     *
-     * @param Zend_Controller_Request_Http $request
-     * @return bool
-     */
-    public function match(Zend_Controller_Request_Http $request)
-    {
-    	$frontName = $this->_getFrontName();
-    	$urlKey = trim($request->getPathInfo(), '/');
-    	    	
-    	if (strpos($urlKey, $frontName . '/') === 0) {
-	    	$parts = explode('/', $urlKey);
+  /*
+   * Validate and Match NoBots and modify request
+   *
+   * @param Zend_Controller_Request_Http $request
+   * @return bool
+   */
+  public function match(Zend_Controller_Request_Http $request)
+  {
+   	$urlKey = trim($request->getPathInfo(), '/');
+    $uris   = Mage::helper('nobots')->getHoneyPotUris();
 
-			if (!in_array($parts[1], array('reject', 'index', 'post'))) {
-				$parts[1] = 'noRoute';
+		if (in_array($urlKey, $uris)) {
+			if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($bot = Mage::helper('nobots')->getBot()) !== false) {
+				$bot->hold();
+
+				$this->showBlockPage();
 			}
-
-			$request->setModuleName($frontName)
-				->setControllerName('verify')
-				->setActionName($parts[1]);
-    	}
-		else {
-	    	$uris = Mage::helper('nobots')->getHoneyPotUris();
-
-			if (!in_array($urlKey, $uris)) {
-				return false;
-			}
-
-			$request->setModuleName($frontName)
-				->setControllerName('verify')
-				->setActionName('reject');
 		}
-		
-		$request->setAlias(
-			Mage_Core_Model_Url_Rewrite::REWRITE_REQUEST_PATH_ALIAS,
-			$urlKey
-		);
 
-		return true;
+		return false;
 	}
-
-	/**
-	 * Retrieve the frontName used by the module
+	
+	/*
 	 *
-	 * @return string
+	 *
+	 *
 	 */
-	protected function _getFrontName()
+	protected function showBlockPage()
 	{
-		return (string)Mage::getConfig()->getNode()->frontend->routers->nobots->args->frontName;
+		header('HTTP/1.0 403 Forbidden');
+		echo Mage::getSingleton('core/layout')->createBlock('core/template')->setTemplate('nobots/blocked.phtml')->toHtml();
+		exit;
 	}
 }

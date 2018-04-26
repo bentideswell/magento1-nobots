@@ -9,54 +9,21 @@
 class Fishpig_NoBots_Model_Observer extends Varien_Object
 {
 	/**
-	 * Load bot and check whether it's banned
-	 * If so, respond accordingly!
-	 *
-	 * @param Varien_Event_Observer $observer
-	 * @return $this
-	 */
-	public function rejectNaughtyBotsObserver(Varien_Event_Observer $observer)
-	{
-		if (Mage::app()->getRequest()->getRouteName() !== 'nobots') {
-			if (($bot = Mage::helper('nobots')->getBot(false)) !== false) {
-				if ($bot->isBanned()) {
-					Mage::dispatchEvent('nobots_verification_redirect', array('bot' => $bot));
-
-					Mage::app()->getResponse()->setRedirect(
-						Mage::helper('nobots')->getVerificationUrl(true)
-					)->sendResponse();
-				}
-			}
-		}
-		
-		return $this;
-	}
-	
-	/**
 	 * Inject the link into the sourcecode before returning to the user
 	 *
 	 * @param Varien_Event_Observer $observer
 	 * @return void
 	 */
-	public function injectNobotsLinksObserver(Varien_Event_Observer $observer)
+	public function injectBotProtectionObserver(Varien_Event_Observer $observer)
 	{
 		$front = $observer->getEvent()->getFront();
-
-		$html = $front->getResponse()->getBody();
+		$html  = $front->getResponse()->getBody();
 		
 		if (($position = strpos($html, '</body>')) === false) {
 			return $this;
 		}
 
 		if (Mage::getStoreConfigFlag('nobots/settings/enabled')) {
-			$modules = Mage::getStoreConfig('nobots/settings/modules');
-
-			if (!Mage::getStoreConfigFlag('nobots/settings/enable_global') || !in_array($modules, array('', '*'))) {
-				if (!in_array(Mage::app()->getRequest()->getModuleName(), (array)explode(',', trim($modules, ',')))) {
-					return $this; // Module not allowed bot protection via config
-				}
-			}
-	
 			$name = Mage::getStoreConfig('general/store_information/name');
 			$url = Mage::helper('nobots')->getHoneyPotUrl();
 	
@@ -75,113 +42,41 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 	
 			$html = substr($html, 0, $position) . $link . substr($html, $position);
 		}
-	
-		// Apply form spam protection		
-		$this->_applyFormSpamProtection($html);
 		
 		$front->getResponse()->setBody($html);
 	}
 
-	/*
+	/**
+	 * Inject the form protection code
 	 *
 	 * @param Varien_Event_Observer $observer
-	 *
 	 * @return void
 	 */
-	public function checkForSecretFormFieldObserver(Varien_Event_Observer $observer)
+	public function injectFormProtectionObserver(Varien_Event_Observer $observer)
 	{
-		return $this;
-		// If it's not frontend, we don't want anything to do with it
-		if ('frontend' !== Mage::getDesign()->getArea()) {
+		$front = $observer->getEvent()->getFront();
+		$html  = $front->getResponse()->getBody();
+		
+		if (($position = strpos($html, '</body>')) === false) {
 			return $this;
 		}
 
-		// Form protection is disabled so return
-		if (!Mage::getStoreConfigFlag('nobots/form_protection/enabled')) {
-			return $this;	
-		}
-		
-		if (!Mage::getStoreConfigFlag('nobots/form_protection/form_secret_field')) {
-			return $this;	
-		}
-		
-		// Ajax request so bail
-		if ($this->isAjax()) {
-			return $this;
-		}
-		
-		// Get some useful variables
-		$request = Mage::app()->getRequest();
-		$method  = strtoupper($request->getMethod());
-		$route	 = strtolower($request->getModuleName() . '/' . $request->getControllerName() . '/' . $request->getActionName());
-		
-		// We're on the checkout so bail!
-		if (strpos($route, 'checkout') !== false) {
-			return $this;
-		}
-		
-		// Check for get and post and check validity
-		$isInvalidGetRequest  = 'GET'  === $method && 1 !== (int)$request->getParam($this->getSecretFormField()) && count($_GET) > 0;
-		$isInvalidPostRequest = 'POST' === $method && 1 !==  (int)$request->getPost($this->getSecretFormField());
-
-		// Check whether the request is good
-		if ($isInvalidGetRequest || $isInvalidPostRequest) {
-			// Log the IP address
-			Mage::log(Mage::helper('core/http')->getRemoteAddr(true), null, 'nobots-form-secret-field-protection.log', true);
-
-			// Add an error message
-			Mage::getSingleton('core/session')->addError(
-				Mage::helper('nobots')->__('The form submission was invalid. If this error persists, please let us know.')
-			);
-
-			// Redirect to the homepage
-			header('Location: ' . Mage::getBaseUrl());
-			exit;
-		}
-	}
-
-	/*
-	 *
-	 * @param  string $html
-	 * @return void
-	 */
-	protected function _applyFormSecretFieldProtection(&$html)
-	{
-		$script = '<script type="text/javascript">(function(){var fs=document.getElementsByTagName(\'form\');for(var i=0;i<fs.length;i++){
-var e=document.createElement(\'input\');e.name=\'' . $this->getSecretFormField() . '\';e.value=1;e.type=\'hidden\';fs[i].appendChild(e);	
-}})();</script>';
-
-		$html = str_replace('</body>', $script . "</body>", $html);
-	}
-	
-	/*
-	 *
-	 *
-	 * @return string
-	 */
-	public function getSecretFormField()
-	{
-		return substr(md5(Mage::getBaseUrl() . '-FishPig-NoBots'), 0, 16);
-	}
-	
-	/**
-	 * Apply form spam protection trick
-	 *
-	 * @param string &$html
-	 * @return $this
-	 */
-	protected function _applyFormSpamProtection(&$html)
-	{
 		if (!Mage::getStoreConfigFlag('nobots/form_protection/enabled')) {
 			return $this;
 		}
 		
-		$modules = Mage::getStoreConfig('nobots/form_protection/modules');
-
-		if (!Mage::getStoreConfigFlag('nobots/form_protection/enable_global') || !in_array($modules, array('', '*'))) {
-			if (!in_array(Mage::app()->getRequest()->getModuleName(), (array)explode(',', trim($modules, ',')))) {
-				return $this; // Module not allowed bot protection via config
+		if (false) {
+			$modules = Mage::getStoreConfig('nobots/form_protection/modules');
+	
+			if (!Mage::getStoreConfigFlag('nobots/form_protection/enable_global') || !in_array($modules, array('', '*'))) {
+				if (!in_array(Mage::app()->getRequest()->getModuleName(), (array)explode(',', trim($modules, ',')))) {
+					return $this; // Module not allowed bot protection via config
+				}
 			}
+		}
+
+		if (strpos(Mage::app()->getRequest()->getModuleName(), 'checkout') !== false) {
+			return false;
 		}
 
 		$formIds = explode("\n", trim(Mage::getStoreConfig('nobots/form_protection/form_ids')));
@@ -231,16 +126,16 @@ var e=document.createElement(\'input\');e.name=\'' . $this->getSecretFormField()
 				$script = sprintf('<script type="text/javascript">%s</script>', implode("", $scripts));				
 				$html = str_replace('</body>', $script . "</body>", $html);
 			}
-		}
+		}		
 		
-		return $this;
+		$front->getResponse()->setBody($html);
 	}
-	
+
 	/*
 	 *
 	 *
 	 */
-	public function blockBadEmailDomainObserver()
+	public function blockBadEmailDomainObserver(Varien_Event_Observer $observer)
 	{
 		$request = Mage::app()->getRequest();
 
@@ -287,9 +182,7 @@ var e=document.createElement(\'input\');e.name=\'' . $this->getSecretFormField()
 			
 			if ($encodedSource !== str_replace($blockedEmailDomains, '', $encodedSource)) {
 				if (true === $this->_checkForBlockedEmailDomains($source, $blockedEmailDomains)) {
-					// Banned domain found so redirect
-					header('Location: ' . Mage::getUrl());
-					exit;
+					$this->blockUser();
 				}
 			}
 		}
@@ -309,35 +202,13 @@ var e=document.createElement(\'input\');e.name=\'' . $this->getSecretFormField()
 			if (count($blockedUrlFields) > 0) {
 				foreach($sources as $key => $source) {
 					if ($this->_arrayContainsUrl($source, $blockedUrlFields)) {
-						// URL found in field so redirect
-						header('Location: ' . Mage::getUrl());
-						exit;
+						$this->blockUser();
 					}
 				}
 			}
 		}
 
 		return $this;
-	}
-	
-	protected function _arrayContainsUrl($source, $fields)
-	{
-		foreach($source as $key => $value) {
-			if (is_array($value)) {
-				if ($this->_arrayContainsUrl($value, $fields)) {
-					return true;
-				}
-			}
-			else if (in_array($key, $fields)) {
-				$value = strtolower($value);
-				
-				if (strpos($value, 'http:') !== false || strpos($value, 'https:') !== false || strpos($value, 'www.') !== false) {
-					return true;
-				}
-			}
-		}
-		
-		return false;
 	}
 
 	/*
@@ -386,5 +257,44 @@ var e=document.createElement(\'input\');e.name=\'' . $this->getSecretFormField()
 	public function isAjax()
 	{
 		return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+	}
+	
+	/*
+	 *
+	 *
+	 */
+	protected function _arrayContainsUrl($source, $fields)
+	{
+		foreach($source as $key => $value) {
+			if (is_array($value)) {
+				if ($this->_arrayContainsUrl($value, $fields)) {
+					return true;
+				}
+			}
+			else if (in_array($key, $fields)) {
+				$value = strtolower($value);
+				
+				if (strpos($value, 'http:') !== false || strpos($value, 'https:') !== false || strpos($value, 'www.') !== false) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	/*
+	 *
+	 *
+	 */
+	protected function blockUser()
+	{
+		if (($bot = Mage::helper('nobots')->getBot()) !== false) {
+			$bot->hold();
+		}
+
+		// Banned domain found so redirect
+		header('Location: ' . Mage::getUrl());
+		exit;
 	}
 }

@@ -112,18 +112,4 @@ class Fishpig_NoBots_Helper_Data extends Mage_Core_Helper_Abstract
 		
 		return false;
 	}
-	
-	/**
-	 * Retrieve the verification URL
-	 *
-	 * @return string
-	 */
-	public function getVerificationUrl($includeRef = true)
-	{
-		return Mage::getUrl('human/verify', array(
-			'_query' => array(
-				Mage_Core_Controller_Varien_Action::PARAM_NAME_URL_ENCODED => Mage::helper('core')->urlEncode(Mage::getUrl('*/*/*', array('_current' => true, '_use_rewrite' => true))),
-			)
-		));
-	}
 }

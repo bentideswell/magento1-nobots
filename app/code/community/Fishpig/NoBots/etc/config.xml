@@ -2,7 +2,7 @@
 <config>
 	<modules>
 		<Fishpig_NoBots>
-			<version>1.5.2.3</version>
+			<version>1.6.0.0</version>
 		</Fishpig_NoBots>
 	</modules>
 	<global>
@@ -58,44 +58,28 @@
 		<events>
 			<controller_front_send_response_before>
 				<observers>
-					<nobots>
+					<nobots_botprotection>
 						<type>singleton</type>
 						<class>nobots/observer</class>
-						<method>injectNobotsLinksObserver</method>
-					</nobots>
+						<method>injectBotProtectionObserver</method>
+					</nobots_botprotection>
+					<nobots_formprotection>
+						<type>singleton</type>
+						<class>nobots/observer</class>
+						<method>injectFormProtectionObserver</method>
+					</nobots_formprotection>
 				</observers>
 			</controller_front_send_response_before>
 			<controller_action_predispatch>
 				<observers>
-					<nobots>
-						<type>singleton</type>
-						<class>nobots/observer</class>
-						<method>rejectNaughtyBotsObserver</method>
-					</nobots>
 					<nobots_email_protect>
 						<type>singleton</type>
 						<class>nobots/observer</class>
 						<method>blockBadEmailDomainObserver</method>
 					</nobots_email_protect>
-					<!--
-					<nobots_form_secret_field_check>
-						<type>singleton</type>
-						<class>nobots/observer</class>
-						<method>checkForSecretFormFieldObserver</method>
-					</nobots_form_secret_field_check>
-					-->
 				</observers>
 			</controller_action_predispatch>
 		</events>
-		<routers>
-			<nobots>
-				<use>standard</use>
-				<args>
-					<module>Fishpig_NoBots</module>
-					<frontName>human</frontName>
-				</args>
-			</nobots>
-		</routers>
 	</frontend>
 	<admin>
 		<routers>
@@ -121,8 +105,6 @@
 		<nobots>
 			<settings>
 				<enabled>1</enabled>
-				<enable_global>1</enable_global>
-				<modules>*</modules>
 			</settings>
 			<form_protection>
 				<enabled>1</enabled>
@@ -142,7 +124,6 @@ lastname
 email
 nickname
 ]]></blocked_url_fields>
-				<!--<form_secret_field>1</form_secret_field>-->
 			</form_protection>
 		</nobots>
 	</default>
