@@ -30,6 +30,7 @@
             				<sort_order>1</sort_order>
             				<show_in_default>1</show_in_default>
             			</enabled>
+            			<!--
             			<modules>
             				<label>Allowed Modules</label>
             				<comment>Only pages served from modules will include the honeypot.</comment>
@@ -41,8 +42,9 @@
             				<show_in_store>1</show_in_store>
             				<depends><enabled>1</enabled></depends>
             			</modules>
+            			-->
             			<whitelist>
-            				<label>White List</label>
+            				<label>IP White List</label>
             				<comment>Enter each IP addresses on a new line</comment>
             				<frontend_type>editor</frontend_type>
             				<sort_order>21</sort_order>
@@ -75,6 +77,7 @@
             				<depends><enabled>1</enabled></depends>
             			</enable_global>
             			-->
+            			<!--
             			<modules>
             				<label>Allowed Modules</label>
             				<comment>Only pages served from modules selected above will have forms protected.</comment>
@@ -86,6 +89,7 @@
             				<show_in_store>1</show_in_store>
             				<depends><enabled>1</enabled></depends>
             			</modules>
+            			-->
             			<form_ids>
             				<label>Protected Form IDs</label>
             				<comment>Enter a list of IDs for the HTML forms that you want to protect. Enter each ID on a new line.</comment>
@@ -95,8 +99,8 @@
             				<depends><enabled>1</enabled></depends>
             			</form_ids>
             			<blocked_email_domains>
-            				<label>Blocked Email Domains</label>
-            				<comment>Enter a list of email domains to block (eg. @qq.com). Enter each email domain on a new line.</comment>
+            				<label>Blocked Strings</label>
+            				<comment>Enter a list of strings (eg. qq.com). Enter each string on a new line. If the string is used in posted data, the user will be blocked.</comment>
             				<frontend_type>editor</frontend_type>
             				<sort_order>11</sort_order>
             				<show_in_default>1</show_in_default>

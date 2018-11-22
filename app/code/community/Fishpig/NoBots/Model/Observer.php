@@ -16,6 +16,14 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 	 */
 	public function injectBotProtectionObserver(Varien_Event_Observer $observer)
 	{
+		if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+			return $this;
+		}
+
+		if ($this->isExcludedModule()) {
+			return $this;
+		}
+		
 		$front = $observer->getEvent()->getFront();
 		$html  = $front->getResponse()->getBody();
 		
@@ -60,6 +68,14 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 	 */
 	public function injectFormProtectionObserver(Varien_Event_Observer $observer)
 	{
+		if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+			return $this;
+		}
+		
+		if ($this->isExcludedModule()) {
+			return $this;
+		}
+
 		$front = $observer->getEvent()->getFront();
 		$html  = $front->getResponse()->getBody();
 		
@@ -135,6 +151,14 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 	 */
 	public function blockBadEmailDomainObserver(Varien_Event_Observer $observer)
 	{
+		if ($this->isSafeUser()) {
+			return $this;
+		}
+
+		if ($this->isExcludedModule()) {
+			return $this;
+		}
+		
 		$request = Mage::app()->getRequest();
 
 		// Only apply to POST requests
@@ -142,50 +166,56 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 			return $this;
 		}
 		
-		$modules = Mage::getStoreConfig('nobots/form_protection/modules');
-
-		if (!in_array(Mage::app()->getRequest()->getModuleName(), (array)explode(',', trim($modules, ',')))) {
-			return $this; // Module not allowed bot protection via config
+		$moduleName = strtolower(Mage::app()->getRequest()->getModuleName());
+		
+		if (in_array($moduleName, array('checkout', 'paypal', 'api', 'sagepay', 'sagepaysuite'))) {
+			return $this;
 		}
 		
+		if (strpos($moduleName, 'checkout') !== false) {
+			return $this;
+		}
+
 		// Get and parse into an array the blocked email domains
-		if ('' === ($blockedEmailDomains = trim(Mage::getStoreConfig('nobots/form_protection/blocked_email_domains')))) {
-			$blockedEmailDomains = '@qq.com';
-		}
-		else {
-			$blockedEmailDomains .= "\n@qq.com";
-		}
-		
-		$blockedEmailDomains = array_unique(explode("\n", $blockedEmailDomains));
-
-		foreach($blockedEmailDomains as $key => $blockedEmailDomain) {
-			$blockedEmailDomain = trim($blockedEmailDomain);
-			
-			if (!$blockedEmailDomain) {
-				unset($blockedEmailDomains[$key]);
-				continue;
+		if ($blockedEmailDomains = trim(Mage::getStoreConfig('nobots/form_protection/blocked_email_domains'))) {
+			$blockedEmailDomains = array_unique(explode("\n", $blockedEmailDomains));
+	
+			foreach($blockedEmailDomains as $key => $blockedEmailDomain) {
+				$blockedEmailDomain = trim($blockedEmailDomain);
+				
+				if (!$blockedEmailDomain) {
+					unset($blockedEmailDomains[$key]);
+					continue;
+				}
+				
+				$blockedEmailDomains[$key] = trim($blockedEmailDomain);
 			}
-			
-			$blockedEmailDomains[$key] = '@' . ltrim($blockedEmailDomain, '@');
 		}
 		
+		$blockedEmailDomains[] = 'qq.com';
+		$blockedEmailDomains[] = '1522ooo9328';
 		$blockedEmailDomains[] = 'arachni@email.gr';
-
+		$blockedEmailDomains   = array_unique($blockedEmailDomains);
+		
 		$sources = array(
 			'POST' => $request->getPost(),
 			'GET'  => $request->getParams(),
 		);
-		
+
 		foreach($sources as $key => $source) {
 			$encodedSource = json_encode($source);
-			
-			if ($encodedSource !== str_replace($blockedEmailDomains, '', $encodedSource)) {
-				if (true === $this->_checkForBlockedEmailDomains($source, $blockedEmailDomains)) {
-					$this->blockUser();
+
+			foreach($blockedEmailDomains as $blockedEmailDomain) {
+				if ($encodedSource !== str_replace($blockedEmailDomain, '', $encodedSource)) {
+					if (true === $this->_checkForBlockedEmailDomains($source, $blockedEmailDomain)) {
+						$this->blockUser();
+						break;
+					}
 				}
+				
 			}
 		}
-		
+
 		// Block URLs in specific fields
 		if ($blockedUrlFields = trim(Mage::getStoreConfig('nobots/form_protection/blocked_url_fields'))) {
 			$blockedUrlFields = explode("\n", $blockedUrlFields);
@@ -214,20 +244,18 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 	 *
 	 *
 	 */
-	protected function _checkForBlockedEmailDomains($data, $blockedEmailDomains)
+	protected function _checkForBlockedEmailDomains($data, $blockedEmailDomain)
 	{
 		if (is_array($data)) {
 			foreach($data as $key => $value) {
-				if (true === $this->_checkForBlockedEmailDomains($value, $blockedEmailDomains)) {
+				if (true === $this->_checkForBlockedEmailDomains($value, $blockedEmailDomain)) {
 					return true;
 				}
 			}
 		}	
 		else if ($data) {
-			foreach($blockedEmailDomains as $blockedEmailDomain) {
-				if ((int)strpos($data, $blockedEmailDomain) === (int)(strlen($data) - strlen($blockedEmailDomain))) {
-					return true;
-				}
+			if ((int)strpos($data, $blockedEmailDomain) === (int)(strlen($data) - strlen($blockedEmailDomain))) {
+				return true;
 			}
 		}
 
@@ -295,5 +323,56 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		// Banned domain found so redirect
 		header('Location: ' . Mage::getUrl());
 		exit;
+	}
+	
+	
+	public function isSafeUser()
+	{
+		if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+			return true;
+		}
+
+		$whiteListedIps = $this->extractIps(
+			trim(file_get_contents(dirname(Mage::getModuleDir('etc', 'Fishpig_NoBots')) . DS . 'whitelist.txt'))
+		);
+
+		if ($whiteList = $this->extractIps(trim(Mage::getStoreConfig('nobots/settings/whitelist')))) {
+			foreach($whiteList as $ip) {
+				$whiteListedIps[] = $ip;
+			}
+		}
+		
+		if (in_array(Mage::helper('core/http')->getRemoteAddr(false), $whiteListedIps)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	protected function extractIps($s)
+	{
+		if (!preg_match_all('/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\n/', "\n" . $s . "\n", $ipMatches)) {
+			return array();
+		}
+		
+		return $ipMatches[1];
+	}
+	
+	protected function isExcludedModule()
+	{
+		$moduleName  = strtolower(Mage::app()->getRequest()->getModuleName());
+		$moduleNames = array('checkout', 'paypal', 'sagepay');
+		
+		foreach($moduleNames as $moduleName) {
+			if (strpos($moduleName, $moduleName) !== false) {
+				return true;
+			}
+		}
+		
+		if ($moduleName === 'api' || $moduleName === 'api2') {
+			return true;
+		}
+		
+		return false;
 	}
 }
