@@ -3,6 +3,9 @@
 # https://fishpig.co.uk/magento/extensions/block-robots-stop-spam/
 ##
 
+06/12/2018 - 1.6.2.1
+- Added logging. Enabled by default.
+
 26/04/2018 - 1.6.0.0
 - Removed ReCaptcha verification feature and added a simple block page. This stops spam/blocked requests from loading all of the Magento library and protects against DDOS.
 - Removed enable by module to simplify configuration

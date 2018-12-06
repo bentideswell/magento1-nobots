@@ -158,7 +158,7 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		if ($this->isExcludedModule()) {
 			return $this;
 		}
-		
+
 		$request = Mage::app()->getRequest();
 
 		// Only apply to POST requests
@@ -208,6 +208,7 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 			foreach($blockedEmailDomains as $blockedEmailDomain) {
 				if ($encodedSource !== str_replace($blockedEmailDomain, '', $encodedSource)) {
 					if (true === $this->_checkForBlockedEmailDomains($source, $blockedEmailDomain)) {
+						$this->_log('User is blocked (bad string).');
 						$this->blockUser();
 						break;
 					}
@@ -231,6 +232,7 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 			if (count($blockedUrlFields) > 0) {
 				foreach($sources as $key => $source) {
 					if ($this->_arrayContainsUrl($source, $blockedUrlFields)) {
+						$this->_log('User is blocked (URL found in non-URL field).');
 						$this->blockUser();
 					}
 				}
@@ -324,11 +326,15 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		header('Location: ' . Mage::getUrl());
 		exit;
 	}
-	
-	
+		
+	/*
+	 *
+	 *
+	 */
 	public function isSafeUser()
 	{
 		if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+			$this->_log('User is safe (logged in).');
 			return true;
 		}
 
@@ -341,14 +347,20 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 				$whiteListedIps[] = $ip;
 			}
 		}
-		
-		if (in_array(Mage::helper('core/http')->getRemoteAddr(false), $whiteListedIps)) {
+
+		if (in_array($this->getIp(), $whiteListedIps)) {
+			$this->_log('User is safe (whitelisted IP).');
+			
 			return true;
 		}
 		
 		return false;
 	}
-	
+
+	/*
+	 *
+	 *
+	 */
 	protected function extractIps($s)
 	{
 		if (!preg_match_all('/([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\n/', "\n" . $s . "\n", $ipMatches)) {
@@ -357,14 +369,18 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		
 		return $ipMatches[1];
 	}
-	
+
+	/*
+	 *
+	 *
+	 */
 	protected function isExcludedModule()
 	{
 		$moduleName  = strtolower(Mage::app()->getRequest()->getModuleName());
 		$moduleNames = array('checkout', 'paypal', 'sagepay');
 		
-		foreach($moduleNames as $moduleName) {
-			if (strpos($moduleName, $moduleName) !== false) {
+		foreach($moduleNames as $find) {
+			if (strpos($moduleName, $find) !== false) {
 				return true;
 			}
 		}
@@ -374,5 +390,27 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		}
 		
 		return false;
+	}
+
+	/*
+	 *
+	 *
+	 */
+	protected function _log($msg)
+	{
+		if (Mage::getStoreConfigFlag('nobots/settings/logging')) {
+			Mage::log($this->getIp() . ': ' . $msg, null, 'nobots.log', true);
+		}
+		
+		return $this;
+	}
+
+	/*
+	 *
+	 *
+	 */
+	public function getIp()
+	{
+		return Mage::helper('core/http')->getRemoteAddr(false);;
 	}
 }

@@ -2,7 +2,7 @@
 <config>
 	<modules>
 		<Fishpig_NoBots>
-			<version>1.6.2.0</version>
+			<version>1.6.2.1</version>
 		</Fishpig_NoBots>
 	</modules>
 	<global>
@@ -105,12 +105,11 @@
 		<nobots>
 			<settings>
 				<enabled>1</enabled>
-				<modules>wordpress,wp_addon_cpt,catalog,catalogsearch,checkout,cms,contacts,customer,review,tag,wishlist</modules>
 				<whitelist></whitelist>
+				<logging>1</logging>
 			</settings>
 			<form_protection>
 				<enabled>1</enabled>
-				<modules>wordpress,wp_addon_cpt,catalog,catalogsearch,checkout,cms,contacts,customer,review,tag,wishlist</modules>
 				<form_ids><![CDATA[contactForm
 pollForm
 product_addtocart_form
