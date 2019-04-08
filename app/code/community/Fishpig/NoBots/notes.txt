@@ -3,6 +3,9 @@
 # https://fishpig.co.uk/magento/extensions/block-robots-stop-spam/
 ##
 
+08/04/2019 - 1.6.2.2
+- Reduced logging for safe users.
+
 06/12/2018 - 1.6.2.1
 - Added logging. Enabled by default.
 

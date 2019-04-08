@@ -334,7 +334,7 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 	public function isSafeUser()
 	{
 		if (Mage::getSingleton('customer/session')->isLoggedIn()) {
-			$this->_log('User is safe (logged in).');
+#			$this->_log('User is safe (logged in).');
 			return true;
 		}
 
@@ -349,7 +349,7 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		}
 
 		if (in_array($this->getIp(), $whiteListedIps)) {
-			$this->_log('User is safe (whitelisted IP).');
+#			$this->_log('User is safe (whitelisted IP).');
 			
 			return true;
 		}
