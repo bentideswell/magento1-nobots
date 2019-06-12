@@ -32,11 +32,11 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		}
 
 		if (Mage::getStoreConfigFlag('nobots/settings/enabled')) {
-			$modules = Mage::getStoreConfig('nobots/settings/modules');
-	
-			if (!in_array(Mage::app()->getRequest()->getModuleName(), (array)explode(',', trim($modules, ',')))) {
-				return $this; // Module not allowed bot protection via config
-			}
+#			$modules = Mage::getStoreConfig('nobots/settings/modules');
+#	
+#			if (!in_array(Mage::app()->getRequest()->getModuleName(), (array)explode(',', trim($modules, ',')))) {
+#				return $this; // Module not allowed bot protection via config
+#			}
 		
 			$name = Mage::getStoreConfig('general/store_information/name');
 			$url = Mage::helper('nobots')->getHoneyPotUrl();
@@ -87,11 +87,11 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 			return $this;
 		}
 		
-		$modules = Mage::getStoreConfig('nobots/form_protection/modules');
-
-		if (!in_array(Mage::app()->getRequest()->getModuleName(), (array)explode(',', trim($modules, ',')))) {
-			return $this; // Module not allowed bot protection via config
-		}
+#		$modules = Mage::getStoreConfig('nobots/form_protection/modules');
+#
+#		if (!in_array(Mage::app()->getRequest()->getModuleName(), (array)explode(',', trim($modules, ',')))) {
+#			return $this; // Module not allowed bot protection via config
+#		}
 
 		$formIds = explode("\n", trim(Mage::getStoreConfig('nobots/form_protection/form_ids')));
 		
