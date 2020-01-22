@@ -27,7 +27,7 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		$front = $observer->getEvent()->getFront();
 		$html  = $front->getResponse()->getBody();
 		
-		if (($position = strpos($html, '</body>')) === false) {
+		if (($position = strrpos($html, '</body>')) === false) {
 			return $this;
 		}
 
@@ -79,7 +79,7 @@ class Fishpig_NoBots_Model_Observer extends Varien_Object
 		$front = $observer->getEvent()->getFront();
 		$html  = $front->getResponse()->getBody();
 		
-		if (($position = strpos($html, '</body>')) === false) {
+		if (($position = strrpos($html, '</body>')) === false) {
 			return $this;
 		}
 
